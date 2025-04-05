@@ -1,4 +1,4 @@
-package br.com.guilherme.ecommerce_manager_api.core.domain.entity;
+package br.com.guilherme.ecommerce_manager_api.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -29,7 +29,7 @@ public class PedidoEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private OrderStatusEnum status;
+    private PedidoStatusEnum status;
 
     @Column(nullable = false)
     private BigDecimal preco;
@@ -44,11 +44,19 @@ public class PedidoEntity {
     private List<PedidoItemEntity> items;
 
     @ManyToOne
-    @JoinColumn(name = "id_usuario", nullable = false)
+    @JoinColumn(name = "id_usuario")
     private UsuarioEntity usuarioId;
 
-    public enum OrderStatusEnum {
-        PENDING, PAID, CANCELLED
+    public boolean isEligibleForPayment() {
+        return this.status == PedidoStatusEnum.PENDENTE;
+    }
+
+    public void setPaymentStatus() {
+        this.status = PedidoStatusEnum.PAGO;
+    }
+
+    public enum PedidoStatusEnum {
+        PENDENTE, PAGO, CANCELADO
     }
 
 }

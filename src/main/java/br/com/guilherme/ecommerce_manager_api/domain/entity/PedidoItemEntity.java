@@ -1,8 +1,11 @@
-package br.com.guilherme.ecommerce_manager_api.core.domain.entity;
+package br.com.guilherme.ecommerce_manager_api.domain.entity;
+
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "pedido_item")
@@ -20,13 +23,13 @@ public class PedidoItemEntity {
 
     @ManyToOne
     @JoinColumn(name = "id_produto", nullable = false)
-    private ProdutoEntity product;
+    private ProdutoEntity produto;
 
     @Column(nullable = false)
-    private Integer quantity;
+    private Integer quantidade;
 
     @Column(nullable = false)
-    private Double price;
+    private BigDecimal preco;
 
     @ManyToOne
     @JoinColumn(name = "id_pedido")

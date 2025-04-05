@@ -1,4 +1,4 @@
-package br.com.guilherme.ecommerce_manager_api.core.domain.entity;
+package br.com.guilherme.ecommerce_manager_api.domain.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
