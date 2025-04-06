@@ -1,9 +1,12 @@
 package br.com.guilherme.ecommerce_manager_api.adapter.exception;
 
 import br.com.guilherme.ecommerce_manager_api.domain.exception.DefaultException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -53,5 +56,29 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ExceptionResponseError> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
+        log.warn("m=handleAccessDenied  msg: {}", ex.getMessage());
+        var exception =  ExceptionResponseError.builder()
+                .httpStatus(HttpStatus.FORBIDDEN.value())
+                .errors(List.of("Você não tem permissão para acessar este recurso", ex.getMessage(), request.getRequestURI()))
+                .timestamp(System.currentTimeMillis())
+                .build();
+
+        return ResponseEntity.status(exception.httpStatus()).body(exception);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<?> handleBadCredentials(BadCredentialsException ex, HttpServletRequest request) {
+        log.warn("m=handleBadCredentials msg: {}", ex.getMessage());
+        var exception =  ExceptionResponseError.builder()
+                .httpStatus(HttpStatus.UNAUTHORIZED.value())
+                .errors(List.of("Credenciais inválidas", ex.getMessage(), request.getRequestURI()))
+                .timestamp(System.currentTimeMillis())
+                .build();
+
+        return ResponseEntity.status(exception.httpStatus()).body(exception);
     }
 }

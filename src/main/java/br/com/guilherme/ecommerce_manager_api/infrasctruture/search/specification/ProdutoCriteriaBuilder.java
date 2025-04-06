@@ -1,4 +1,4 @@
-package br.com.guilherme.ecommerce_manager_api.domain.specification;
+package br.com.guilherme.ecommerce_manager_api.infrasctruture.search.specification;
 
 import br.com.guilherme.ecommerce_manager_api.dto.produto.ProdutoSearchFilterDTO;
 import org.springframework.data.elasticsearch.core.query.Criteria;

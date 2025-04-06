@@ -27,10 +27,11 @@ public class PedidoService {
     private final ProdutoService produtoService;
     private final ProdutoSearchRepository produtoSearchRepository;
     private final KafkaProducerService kafkaService;
+    private final AuthService authService;
 
     public PedidoResponseDTO create(PedidoRequestDTO pedido) {
         log.info("Criando novo pedido");
-        var entity = mapper.toEntity(pedido, produtoService);
+        var entity = mapper.toEntity(pedido, produtoService, authService);
         try {
             validateItemsStock(entity);
             return mapper.toResponse(repository.save(entity));

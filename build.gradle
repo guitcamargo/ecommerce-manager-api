@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.4'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.flywaydb.flyway' version '9.22.3'
 }
 
 group = 'br.com.guilherme'
@@ -23,6 +24,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 
 	//mysql
 	implementation 'com.mysql:mysql-connector-j:8.0.33'
@@ -46,6 +48,13 @@ dependencies {
 
 	//kafka
 	implementation 'org.springframework.kafka:spring-kafka'
+
+	//jwt
+	implementation 'com.auth0:java-jwt:4.4.0'
+
+	//flyway
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-mysql'
 
 	testCompileOnly 'org.projectlombok:lombok:1.18.30'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'

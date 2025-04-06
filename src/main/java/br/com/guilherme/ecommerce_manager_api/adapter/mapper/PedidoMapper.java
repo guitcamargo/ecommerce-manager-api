@@ -1,7 +1,9 @@
 package br.com.guilherme.ecommerce_manager_api.adapter.mapper;
 
 
+import br.com.guilherme.ecommerce_manager_api.application.service.AuthService;
 import br.com.guilherme.ecommerce_manager_api.application.service.ProdutoService;
+import br.com.guilherme.ecommerce_manager_api.application.service.UsuarioService;
 import br.com.guilherme.ecommerce_manager_api.domain.entity.PedidoEntity;
 import br.com.guilherme.ecommerce_manager_api.domain.entity.PedidoItemEntity;
 import br.com.guilherme.ecommerce_manager_api.dto.pedido.PedidoRequestDTO;
@@ -22,7 +24,7 @@ public interface PedidoMapper {
     PedidoResponseDTO toResponse(PedidoEntity entity);
 
     @Named("toEntityWithService")
-    default PedidoEntity toEntity(PedidoRequestDTO dto, @Context ProdutoService service) {
+    default PedidoEntity toEntity(PedidoRequestDTO dto, @Context ProdutoService service, @Context AuthService authService) {
         var itemsEntity = dto.items().stream()
                 .map(item -> {
                     var produto = service.findEntityById(item.id());
@@ -40,8 +42,10 @@ public interface PedidoMapper {
                 )
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        var usuario = authService.extractUserLogged();
+
         var pedido = PedidoEntity.builder()
-                .usuarioId(null)
+                .usuarioId(usuario)
                 .status(PedidoEntity.PedidoStatusEnum.PENDENTE)
                 .preco(valorTotal)
                 .build();

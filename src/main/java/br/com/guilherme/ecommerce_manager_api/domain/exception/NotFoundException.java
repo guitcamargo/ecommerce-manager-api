@@ -22,4 +22,8 @@ public class NotFoundException extends DefaultException {
     public static NotFoundException ofPedido(Long id) {
         return new NotFoundException(String.format("Pedido não encontrado - id: %d", id));
     }
+
+    public static NotFoundException ofUsuario(Long id) {
+        return new NotFoundException(String.format("Usuario não encontrado - id: %d", id));
+    }
 }
