@@ -8,6 +8,7 @@ import br.com.guilherme.ecommerce_manager_api.domain.exception.NotFoundException
 import br.com.guilherme.ecommerce_manager_api.domain.exception.PedidoStatusException;
 import br.com.guilherme.ecommerce_manager_api.dto.pedido.PedidoRequestDTO;
 import br.com.guilherme.ecommerce_manager_api.dto.pedido.PedidoResponseDTO;
+import br.com.guilherme.ecommerce_manager_api.infrasctruture.message.KafkaProducerService;
 import br.com.guilherme.ecommerce_manager_api.infrasctruture.repository.PedidoRepository;
 import br.com.guilherme.ecommerce_manager_api.infrasctruture.repository.ProdutoSearchRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class PedidoService {
     private final PedidoMapper mapper;
     private final ProdutoService produtoService;
     private final ProdutoSearchRepository produtoSearchRepository;
-
+    private final KafkaProducerService kafkaService;
 
     public PedidoResponseDTO create(PedidoRequestDTO pedido) {
         log.info("Criando novo pedido");
@@ -51,6 +52,7 @@ public class PedidoService {
             validateItemsStock(pedido);
             pedido.setPaymentStatus();
             repository.save(pedido);
+            kafkaService.sendPedidoPaid(pedidoId);
         } catch (EstoqueInsuficienteException e) {
             log.error("Erro ao processar pagamento. {}", e.getMessage(), e);
             throw e;
@@ -83,4 +85,14 @@ public class PedidoService {
                 });
     }
 
-} 
+    @Transactional
+    public void processPosPayment(Long pedidoId) {
+        var pedido = this.repository.findById(pedidoId)
+                .orElseThrow(() -> NotFoundException.ofPedido(pedidoId));
+
+        pedido.getItems().forEach(item ->
+                produtoService.updateStock(item.getProduto().getId(), item.getQuantidade())
+        );
+
+    }
+}

@@ -79,4 +79,13 @@ public class ProdutoService {
     private void indexProduto(ProdutoEntity produto) {
         produtoSearchRepository.save(mapper.toDocument(produto));
     }
+
+    @Transactional
+    public void updateStock(String idProduto, int quantidade) {
+        ProdutoEntity produto = this.findEntityById(idProduto);
+
+        produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() - quantidade);
+        repository.save(produto);
+        indexProduto(produto);
+    }
 }
