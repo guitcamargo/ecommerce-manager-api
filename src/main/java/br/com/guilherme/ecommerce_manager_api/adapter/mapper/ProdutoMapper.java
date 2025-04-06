@@ -1,5 +1,6 @@
 package br.com.guilherme.ecommerce_manager_api.adapter.mapper;
 
+import br.com.guilherme.ecommerce_manager_api.domain.document.ProdutoDocument;
 import br.com.guilherme.ecommerce_manager_api.domain.entity.ProdutoEntity;
 import br.com.guilherme.ecommerce_manager_api.dto.produto.ProdutoRequestDTO;
 import br.com.guilherme.ecommerce_manager_api.dto.produto.ProdutoResponseDTO;
@@ -21,4 +22,6 @@ public interface ProdutoMapper {
     @Mapping(target = "dataCriacao", ignore = true)
     @Mapping(target = "dataAtualizacao", ignore = true)
     void updateEntityFromDto(ProdutoRequestDTO dto, @MappingTarget ProdutoEntity entity);
+
+    ProdutoDocument toDocument(ProdutoEntity produto);
 }

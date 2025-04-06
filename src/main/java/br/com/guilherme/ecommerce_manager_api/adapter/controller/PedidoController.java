@@ -28,7 +28,7 @@ public class PedidoController {
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)
-    @PostMapping("/{id}/pay")
+    @PutMapping("/{id}/pagamento")
     @Operation(summary = "Pagar pedido", description = "Realiza o pagamento de um pedido")
     //@PreAuthorize("hasRole('USER')")
     public void payOrder(@PathVariable Long id) {

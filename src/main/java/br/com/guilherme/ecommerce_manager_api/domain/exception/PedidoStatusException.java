@@ -16,6 +16,6 @@ public class PedidoStatusException extends DefaultException {
     }
 
     public static PedidoStatusException ofStatus(String status) {
-        return new PedidoStatusException(String.format("Pedido não pode ser pago, status atual:", status));
+        return new PedidoStatusException(String.format("Pedido não pode ser pago, status atual: %s", status));
     }
 }

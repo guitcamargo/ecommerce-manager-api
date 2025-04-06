@@ -40,12 +40,15 @@ public interface PedidoMapper {
                 )
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return PedidoEntity.builder()
+        var pedido = PedidoEntity.builder()
                 .usuarioId(null)
                 .status(PedidoEntity.PedidoStatusEnum.PENDENTE)
                 .preco(valorTotal)
-                .items(itemsEntity)
                 .build();
+
+        pedido.setItems(itemsEntity);
+        itemsEntity.forEach(item -> item.setPedido(pedido));
+        return pedido;
     }
 
 }

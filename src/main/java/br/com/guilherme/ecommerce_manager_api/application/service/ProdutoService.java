@@ -6,6 +6,7 @@ import br.com.guilherme.ecommerce_manager_api.domain.exception.NotFoundException
 import br.com.guilherme.ecommerce_manager_api.dto.produto.ProdutoRequestDTO;
 import br.com.guilherme.ecommerce_manager_api.dto.produto.ProdutoResponseDTO;
 import br.com.guilherme.ecommerce_manager_api.infrasctruture.repository.ProdutoRepository;
+import br.com.guilherme.ecommerce_manager_api.infrasctruture.repository.ProdutoSearchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,8 @@ public class ProdutoService {
 
     private final ProdutoRepository repository;
     private final ProdutoMapper mapper;
+    private final ProdutoSearchRepository searchRepository;
+    private final ProdutoSearchRepository produtoSearchRepository;
 
     public ProdutoResponseDTO findById(String id) {
         return mapper.toResponse(this.repository.findById(id)
@@ -32,6 +35,7 @@ public class ProdutoService {
     public ProdutoResponseDTO create(ProdutoRequestDTO dto) {
         log.info("Creating new produto: {}", dto);
         var saved = repository.save(mapper.toEntity(dto));
+        this.indexProduto(saved);
         return mapper.toResponse(saved);
     }
 
@@ -48,6 +52,7 @@ public class ProdutoService {
         ProdutoEntity existing = this.findEntityById(id);
 
         mapper.updateEntityFromDto(dto, existing);
+        this.indexProduto(existing);
         var updated = repository.save(existing);
         return mapper.toResponse(updated);
     }
@@ -58,6 +63,7 @@ public class ProdutoService {
         var entity = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
         repository.delete(entity);
+        produtoSearchRepository.deleteById(entity.getId());
     }
 
     public ProdutoEntity findEntityById(String id) {
@@ -68,5 +74,9 @@ public class ProdutoService {
 
     public void validate(String produtoId) {
         this.findById(produtoId);
+    }
+
+    private void indexProduto(ProdutoEntity produto) {
+        produtoSearchRepository.save(mapper.toDocument(produto));
     }
 }
