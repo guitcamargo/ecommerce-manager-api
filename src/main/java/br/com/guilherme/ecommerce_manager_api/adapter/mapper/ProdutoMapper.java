@@ -17,6 +17,7 @@ public interface ProdutoMapper {
 
     ProdutoResponseDTO toResponse(ProdutoEntity entity);
 
+    ProdutoResponseDTO documentToResponse(ProdutoDocument document);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "dataCriacao", ignore = true)

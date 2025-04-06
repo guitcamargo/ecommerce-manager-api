@@ -12,9 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -22,7 +19,6 @@ public class ProdutoService {
 
     private final ProdutoRepository repository;
     private final ProdutoMapper mapper;
-    private final ProdutoSearchRepository searchRepository;
     private final ProdutoSearchRepository produtoSearchRepository;
 
     public ProdutoResponseDTO findById(String id) {
@@ -37,13 +33,6 @@ public class ProdutoService {
         var saved = repository.save(mapper.toEntity(dto));
         this.indexProduto(saved);
         return mapper.toResponse(saved);
-    }
-
-    public List<ProdutoResponseDTO> findAll() {
-        log.info("Finding all produtos");
-        return repository.findAll().stream()
-                .map(mapper::toResponse)
-                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -61,7 +50,7 @@ public class ProdutoService {
     public void delete(String id) {
         log.info("Deleting produto");
         var entity = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                .orElseThrow(() -> NotFoundException.ofProduct(id));
         repository.delete(entity);
         produtoSearchRepository.deleteById(entity.getId());
     }
