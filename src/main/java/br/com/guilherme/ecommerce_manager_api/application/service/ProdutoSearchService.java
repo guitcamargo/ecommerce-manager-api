@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProdutoSearchService {
 
-    private ProdutoSearchOPS produtoSearchOPS;
+    private final ProdutoSearchOPS produtoSearchOPS;
 
     public List<ProdutoResponseDTO> findAllBy(ProdutoSearchFilterDTO filter) {
         log.info("m=findAllBy Buscando produtos, filtro: {}", filter);
