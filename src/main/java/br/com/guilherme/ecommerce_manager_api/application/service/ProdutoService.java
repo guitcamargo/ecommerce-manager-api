@@ -5,8 +5,8 @@ import br.com.guilherme.ecommerce_manager_api.domain.entity.ProdutoEntity;
 import br.com.guilherme.ecommerce_manager_api.domain.exception.NotFoundException;
 import br.com.guilherme.ecommerce_manager_api.dto.produto.ProdutoRequestDTO;
 import br.com.guilherme.ecommerce_manager_api.dto.produto.ProdutoResponseDTO;
-import br.com.guilherme.ecommerce_manager_api.infrasctruture.repository.ProdutoRepository;
-import br.com.guilherme.ecommerce_manager_api.infrasctruture.repository.ProdutoSearchRepository;
+import br.com.guilherme.ecommerce_manager_api.infrasctruture.persistence.repository.ProdutoRepository;
+import br.com.guilherme.ecommerce_manager_api.infrasctruture.persistence.repository.ProdutoSearchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,6 +22,7 @@ public class ProdutoService {
     private final ProdutoSearchRepository produtoSearchRepository;
 
     public ProdutoResponseDTO findById(String id) {
+        log.info("m=findById Buscando produto com id {}", id);
         return mapper.toResponse(this.repository.findById(id)
                 .orElseThrow(() -> NotFoundException.ofProduct(id)
                 ));
@@ -29,7 +30,7 @@ public class ProdutoService {
 
     @Transactional
     public ProdutoResponseDTO create(ProdutoRequestDTO dto) {
-        log.info("Creating new produto: {}", dto);
+        log.info("m=create Creating new produto: {}", dto);
         var saved = repository.save(mapper.toEntity(dto));
         this.indexProduto(saved);
         return mapper.toResponse(saved);
@@ -37,7 +38,7 @@ public class ProdutoService {
 
     @Transactional
     public ProdutoResponseDTO update(String id, ProdutoRequestDTO dto) {
-        log.info("Updating produto: {}", dto);
+        log.info("m=update Updating produto: {}", dto);
         ProdutoEntity existing = this.findEntityById(id);
 
         mapper.updateEntityFromDto(dto, existing);
@@ -48,7 +49,7 @@ public class ProdutoService {
 
     @Transactional
     public void delete(String id) {
-        log.info("Deleting produto");
+        log.info("m=delete Deleting produto");
         var entity = repository.findById(id)
                 .orElseThrow(() -> NotFoundException.ofProduct(id));
         repository.delete(entity);
@@ -66,11 +67,13 @@ public class ProdutoService {
     }
 
     private void indexProduto(ProdutoEntity produto) {
+        log.info("m=indexProduto indexando produto elasticsearch {}", produto);
         produtoSearchRepository.save(mapper.toDocument(produto));
     }
 
     @Transactional
     public void updateStock(String idProduto, int quantidade) {
+        log.info("m=updateStock atualizando estoque do produto {}", idProduto);
         ProdutoEntity produto = this.findEntityById(idProduto);
 
         produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() - quantidade);

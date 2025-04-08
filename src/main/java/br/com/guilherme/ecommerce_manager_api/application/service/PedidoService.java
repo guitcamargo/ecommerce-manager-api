@@ -3,18 +3,27 @@ package br.com.guilherme.ecommerce_manager_api.application.service;
 import br.com.guilherme.ecommerce_manager_api.adapter.mapper.PedidoMapper;
 import br.com.guilherme.ecommerce_manager_api.domain.document.ProdutoDocument;
 import br.com.guilherme.ecommerce_manager_api.domain.entity.PedidoEntity;
+import br.com.guilherme.ecommerce_manager_api.domain.entity.PedidoItemEntity;
 import br.com.guilherme.ecommerce_manager_api.domain.exception.EstoqueInsuficienteException;
 import br.com.guilherme.ecommerce_manager_api.domain.exception.NotFoundException;
+import br.com.guilherme.ecommerce_manager_api.domain.exception.PedidoCanceladoException;
 import br.com.guilherme.ecommerce_manager_api.domain.exception.PedidoStatusException;
 import br.com.guilherme.ecommerce_manager_api.dto.pedido.PedidoRequestDTO;
 import br.com.guilherme.ecommerce_manager_api.dto.pedido.PedidoResponseDTO;
+import br.com.guilherme.ecommerce_manager_api.dto.relatorio.FaturamentoMensalResponseDTO;
+import br.com.guilherme.ecommerce_manager_api.dto.relatorio.TicketMedioResponseDTO;
+import br.com.guilherme.ecommerce_manager_api.dto.relatorio.TopClientesResponseDTO;
 import br.com.guilherme.ecommerce_manager_api.infrasctruture.message.KafkaProducerService;
-import br.com.guilherme.ecommerce_manager_api.infrasctruture.repository.PedidoRepository;
-import br.com.guilherme.ecommerce_manager_api.infrasctruture.repository.ProdutoSearchRepository;
+import br.com.guilherme.ecommerce_manager_api.infrasctruture.persistence.repository.PedidoRepository;
+import br.com.guilherme.ecommerce_manager_api.infrasctruture.persistence.repository.ProdutoSearchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -29,21 +38,24 @@ public class PedidoService {
     private final KafkaProducerService kafkaService;
     private final AuthService authService;
 
-    public PedidoResponseDTO create(PedidoRequestDTO pedido) {
-        log.info("Criando novo pedido");
+    @Transactional(noRollbackFor = PedidoCanceladoException.class)
+    public PedidoResponseDTO create(PedidoRequestDTO pedido) throws PedidoCanceladoException {
+        log.info("m=create Criando novo pedido, pedido={}", pedido);
         var entity = mapper.toEntity(pedido, produtoService, authService);
         try {
             validateItemsStock(entity);
             return mapper.toResponse(repository.save(entity));
         } catch (EstoqueInsuficienteException e) {
             log.error("Erro ao criar pedido, msg: {}", e.getMessage(), e);
-            throw e;
+            entity.setCancelledStatus();
+            repository.save(entity);
+            throw new PedidoCanceladoException("Pedido Cancelado - "+e.getMessage());
         }
     }
 
     @Transactional
     public void processPayment(Long pedidoId) {
-        log.info("Processando pagamento para o pedido {}", pedidoId);
+        log.info("m=processPayment Processando pagamento para o pedido {}", pedidoId);
         var pedido = this.findEntityById(pedidoId);
         
         if (!pedido.isEligibleForPayment()) {
@@ -61,6 +73,7 @@ public class PedidoService {
     }
 
     private PedidoEntity findEntityById(Long pedidoId){
+        log.info("m=findEntityById pedidoId={}", pedidoId);
         return repository.findById(pedidoId).orElseThrow(
                 () -> NotFoundException.ofPedido(pedidoId)
         );
@@ -88,6 +101,7 @@ public class PedidoService {
 
     @Transactional
     public void processPosPayment(Long pedidoId) {
+        log.info("m=processPosPayment atualizando estoque, pedidoId:{}", pedidoId);
         var pedido = this.repository.findById(pedidoId)
                 .orElseThrow(() -> NotFoundException.ofPedido(pedidoId));
 
@@ -95,5 +109,26 @@ public class PedidoService {
                 produtoService.updateStock(item.getProduto().getId(), item.getQuantidade())
         );
 
+    }
+
+    public List<TopClientesResponseDTO> findTopClients(LocalDateTime inicio, LocalDateTime fim, Pageable pageable) {
+        return repository.findTopUsers(inicio, fim, PedidoEntity.PedidoStatusEnum.PAGO, pageable)
+                .stream()
+                .map(r ->
+                        new TopClientesResponseDTO(r.getIdUsuario(), r.getNome(), r.getTotalPedido(), r.getValorTotal()))
+                .toList();
+    }
+
+    public List<TicketMedioResponseDTO> getTicketMedio(LocalDateTime inicio, LocalDateTime fim) {
+        return repository.getTicketMedio(inicio, fim, PedidoEntity.PedidoStatusEnum.PAGO)
+                .stream()
+                .map(r ->
+                        new TicketMedioResponseDTO(r.getIdUsuario(), r.getNome(), r.getTicketMedio()))
+                .toList();
+    }
+
+    public FaturamentoMensalResponseDTO getTotalRevenueForCurrentMonth() {
+        var projection = repository.getTotalRevenueForCurrentMonth(PedidoEntity.PedidoStatusEnum.PAGO);
+        return new FaturamentoMensalResponseDTO(projection.getTotal());
     }
 }

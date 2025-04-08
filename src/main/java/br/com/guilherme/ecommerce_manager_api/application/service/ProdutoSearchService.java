@@ -17,7 +17,7 @@ public class ProdutoSearchService {
     private ProdutoSearchOPS produtoSearchOPS;
 
     public List<ProdutoResponseDTO> findAllBy(ProdutoSearchFilterDTO filter) {
-        log.info("Buscando produtos, filtro: {}", filter);
+        log.info("m=findAllBy Buscando produtos, filtro: {}", filter);
         return produtoSearchOPS.findAllBy(filter);
     }
 

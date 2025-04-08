@@ -45,7 +45,7 @@ public interface PedidoMapper {
         var usuario = authService.extractUserLogged();
 
         var pedido = PedidoEntity.builder()
-                .usuarioId(usuario)
+                .usuario(usuario)
                 .status(PedidoEntity.PedidoStatusEnum.PENDENTE)
                 .preco(valorTotal)
                 .build();

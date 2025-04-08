@@ -1,6 +1,7 @@
 package br.com.guilherme.ecommerce_manager_api.adapter.controller;
 
 import br.com.guilherme.ecommerce_manager_api.application.service.PedidoService;
+import br.com.guilherme.ecommerce_manager_api.domain.exception.PedidoCanceladoException;
 import br.com.guilherme.ecommerce_manager_api.dto.pedido.PedidoRequestDTO;
 import br.com.guilherme.ecommerce_manager_api.dto.pedido.PedidoResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,7 +27,7 @@ public class PedidoController {
     @PostMapping
     @Operation(summary = "Criar pedido", description = "Cria um novo pedido no sistema")
     @PreAuthorize("hasRole('USER')")
-    public PedidoResponseDTO create(@Valid @RequestBody PedidoRequestDTO pedido) {
+    public PedidoResponseDTO create(@Valid @RequestBody PedidoRequestDTO pedido) throws PedidoCanceladoException {
         return service.create(pedido);
     }
 

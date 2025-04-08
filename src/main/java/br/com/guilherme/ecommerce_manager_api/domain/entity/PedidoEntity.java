@@ -45,7 +45,7 @@ public class PedidoEntity {
 
     @ManyToOne
     @JoinColumn(name = "id_usuario")
-    private UsuarioEntity usuarioId;
+    private UsuarioEntity usuario;
 
     public boolean isEligibleForPayment() {
         return this.status == PedidoStatusEnum.PENDENTE;
@@ -53,6 +53,14 @@ public class PedidoEntity {
 
     public void setPaymentStatus() {
         this.status = PedidoStatusEnum.PAGO;
+    }
+
+    public void setCancelledStatus() {
+        this.status = PedidoStatusEnum.CANCELADO;
+    }
+
+    public void setIniciatedStatus() {
+        this.status = PedidoStatusEnum.PENDENTE;
     }
 
     public enum PedidoStatusEnum {

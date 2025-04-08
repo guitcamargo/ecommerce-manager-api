@@ -2,7 +2,7 @@ package br.com.guilherme.ecommerce_manager_api.application.service;
 
 import br.com.guilherme.ecommerce_manager_api.domain.entity.UsuarioEntity;
 import br.com.guilherme.ecommerce_manager_api.domain.exception.NotFoundException;
-import br.com.guilherme.ecommerce_manager_api.infrasctruture.repository.UsuarioRepository;
+import br.com.guilherme.ecommerce_manager_api.infrasctruture.persistence.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

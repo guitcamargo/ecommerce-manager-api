@@ -1,6 +1,7 @@
 package br.com.guilherme.ecommerce_manager_api.adapter.exception;
 
 import br.com.guilherme.ecommerce_manager_api.domain.exception.DefaultException;
+import br.com.guilherme.ecommerce_manager_api.domain.exception.PedidoCanceladoException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -33,11 +34,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponseError> handleDefaultException(DefaultException ex) {
         log.error("m=handleDefaultException, msg={}, ex", ex.getMessage(), ex);
         var httpStatus = ex.getHttpStatus();
-        var exception = ExceptionResponseError.builder()
-                .httpStatus(httpStatus.value())
-                .errors(List.of(ex.getMessage()))
-                .timestamp(ex.getTimestamp())
-                .build();
+        var errors = List.of(ex.getMessage());
+
+        var exception =  makeExceptionResponseError(httpStatus, errors);
         return ResponseEntity.status(exception.httpStatus()).body(exception);
     }
 
@@ -45,27 +44,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponseError> handleValidation(MethodArgumentNotValidException ex) {
         log.error("m=handleValidation, ex={}", ex.getMessage());
 
-        List<String> mensagens = ex.getBindingResult().getFieldErrors().stream()
+        List<String> errors = ex.getBindingResult().getFieldErrors().stream()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .toList();
 
-        var response = ExceptionResponseError.builder()
-                .httpStatus(HttpStatus.BAD_REQUEST.value())
-                .errors(mensagens)
-                .timestamp(System.currentTimeMillis())
-                .build();
+        var exception = makeExceptionResponseError(HttpStatus.BAD_REQUEST ,errors);
 
-        return ResponseEntity.badRequest().body(response);
+        return ResponseEntity.status(exception.httpStatus()).body(exception);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ExceptionResponseError> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
         log.warn("m=handleAccessDenied  msg: {}", ex.getMessage());
-        var exception =  ExceptionResponseError.builder()
-                .httpStatus(HttpStatus.FORBIDDEN.value())
-                .errors(List.of("Você não tem permissão para acessar este recurso", ex.getMessage(), request.getRequestURI()))
-                .timestamp(System.currentTimeMillis())
-                .build();
+        var errors = List.of("Você não tem permissão para acessar este recurso", ex.getMessage(), request.getRequestURI());
+        var exception = makeExceptionResponseError(HttpStatus.FORBIDDEN,  errors);
 
         return ResponseEntity.status(exception.httpStatus()).body(exception);
     }
@@ -73,12 +65,27 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> handleBadCredentials(BadCredentialsException ex, HttpServletRequest request) {
         log.warn("m=handleBadCredentials msg: {}", ex.getMessage());
-        var exception =  ExceptionResponseError.builder()
-                .httpStatus(HttpStatus.UNAUTHORIZED.value())
-                .errors(List.of("Credenciais inválidas", ex.getMessage(), request.getRequestURI()))
-                .timestamp(System.currentTimeMillis())
-                .build();
+        var errors = List.of("Credenciais inválidas", ex.getMessage(), request.getRequestURI());
+        var exception =  makeExceptionResponseError(HttpStatus.UNAUTHORIZED, errors);
 
         return ResponseEntity.status(exception.httpStatus()).body(exception);
+    }
+
+    @ExceptionHandler(PedidoCanceladoException.class)
+    public ResponseEntity<ExceptionResponseError> handlePedidoCanceladoException(PedidoCanceladoException ex) {
+        log.warn("m=handlePedidoCanceladoException msg: {}", ex.getMessage());
+        var errors = List.of(ex.getMessage());
+        var exception = makeExceptionResponseError(HttpStatus.BAD_REQUEST, errors);
+        return ResponseEntity
+                .status(exception.httpStatus())
+                .body(exception);
+    }
+
+    private ExceptionResponseError makeExceptionResponseError(HttpStatus httpStatus, List<String> messagesError) {
+     return  ExceptionResponseError.builder()
+             .httpStatus(httpStatus.value())
+             .errors(messagesError)
+             .timestamp(System.currentTimeMillis())
+             .build();
     }
 }

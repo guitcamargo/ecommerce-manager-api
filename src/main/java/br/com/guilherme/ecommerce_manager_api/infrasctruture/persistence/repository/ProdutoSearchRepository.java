@@ -1,4 +1,4 @@
-package br.com.guilherme.ecommerce_manager_api.infrasctruture.repository;
+package br.com.guilherme.ecommerce_manager_api.infrasctruture.persistence.repository;
 
 import br.com.guilherme.ecommerce_manager_api.domain.document.ProdutoDocument;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;

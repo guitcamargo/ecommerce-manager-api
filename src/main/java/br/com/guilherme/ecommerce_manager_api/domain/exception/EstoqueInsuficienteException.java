@@ -18,4 +18,8 @@ public class EstoqueInsuficienteException extends DefaultException {
     public static EstoqueInsuficienteException ofProdutos(String produtos) {
         return new EstoqueInsuficienteException(String.format("Pedido não pode ser processado, estoque insuficiente para os produtos %s:", produtos));
     }
+
+    public static EstoqueInsuficienteException errorCreate() {
+        return new EstoqueInsuficienteException(String.format("O seu pedido foi alterado para o status CANCELADO"));
+    }
 }

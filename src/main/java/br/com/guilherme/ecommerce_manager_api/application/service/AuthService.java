@@ -21,7 +21,7 @@ public class AuthService {
     private final JwtService jwtService;
 
     public AuthResponseDTO auth(AuthRequestDTO request) {
-        log.info("Auth request: {}", request);
+        log.info("m=auth Request de autorização: {}", request);
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.login(), request.password())
         );
