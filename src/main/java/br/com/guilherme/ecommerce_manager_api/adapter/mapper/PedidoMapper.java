@@ -3,7 +3,6 @@ package br.com.guilherme.ecommerce_manager_api.adapter.mapper;
 
 import br.com.guilherme.ecommerce_manager_api.application.service.AuthService;
 import br.com.guilherme.ecommerce_manager_api.application.service.ProdutoService;
-import br.com.guilherme.ecommerce_manager_api.application.service.UsuarioService;
 import br.com.guilherme.ecommerce_manager_api.domain.entity.PedidoEntity;
 import br.com.guilherme.ecommerce_manager_api.domain.entity.PedidoItemEntity;
 import br.com.guilherme.ecommerce_manager_api.dto.pedido.PedidoRequestDTO;

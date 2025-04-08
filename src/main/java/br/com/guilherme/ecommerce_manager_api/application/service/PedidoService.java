@@ -3,7 +3,6 @@ package br.com.guilherme.ecommerce_manager_api.application.service;
 import br.com.guilherme.ecommerce_manager_api.adapter.mapper.PedidoMapper;
 import br.com.guilherme.ecommerce_manager_api.domain.document.ProdutoDocument;
 import br.com.guilherme.ecommerce_manager_api.domain.entity.PedidoEntity;
-import br.com.guilherme.ecommerce_manager_api.domain.entity.PedidoItemEntity;
 import br.com.guilherme.ecommerce_manager_api.domain.exception.EstoqueInsuficienteException;
 import br.com.guilherme.ecommerce_manager_api.domain.exception.NotFoundException;
 import br.com.guilherme.ecommerce_manager_api.domain.exception.PedidoCanceladoException;
