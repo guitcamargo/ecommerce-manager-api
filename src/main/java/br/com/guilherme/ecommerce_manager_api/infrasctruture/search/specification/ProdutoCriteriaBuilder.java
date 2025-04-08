@@ -13,7 +13,7 @@ public class ProdutoCriteriaBuilder {
         }
 
         if (filtro.categoria() != null && !filtro.categoria().isBlank()) {
-            criteria = criteria.and(new Criteria("categoria").is(filtro.categoria()));
+            criteria = criteria.and(new Criteria("categoria").contains(filtro.categoria()));
         }
 
         if (filtro.precoMin() != null) {
