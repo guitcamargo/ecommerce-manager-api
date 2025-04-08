@@ -1,4 +1,4 @@
-package br.com.guilherme.ecommerce_manager_api.application.service;
+package br.com.guilherme.ecommerce_manager_api.application.produto;
 
 import br.com.guilherme.ecommerce_manager_api.adapter.mapper.ProdutoMapper;
 import br.com.guilherme.ecommerce_manager_api.domain.entity.ProdutoEntity;
@@ -15,12 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ProdutoService {
+public class ProdutoServiceImpl implements ProdutoService {
 
     private final ProdutoRepository repository;
     private final ProdutoMapper mapper;
     private final ProdutoSearchRepository produtoSearchRepository;
 
+    @Override
     public ProdutoResponseDTO findById(String id) {
         log.info("m=findById Buscando produto com id {}", id);
         return mapper.toResponse(this.repository.findById(id)
@@ -28,6 +29,7 @@ public class ProdutoService {
                 ));
     }
 
+    @Override
     @Transactional
     public ProdutoResponseDTO create(ProdutoRequestDTO dto) {
         log.info("m=create Creating new produto: {}", dto);
@@ -36,6 +38,7 @@ public class ProdutoService {
         return mapper.toResponse(saved);
     }
 
+    @Override
     @Transactional
     public ProdutoResponseDTO update(String id, ProdutoRequestDTO dto) {
         log.info("m=update Updating produto: {}", dto);
@@ -47,6 +50,7 @@ public class ProdutoService {
         return mapper.toResponse(updated);
     }
 
+    @Override
     @Transactional
     public void delete(String id) {
         log.info("m=delete Deleting produto");
@@ -56,12 +60,14 @@ public class ProdutoService {
         produtoSearchRepository.deleteById(entity.getId());
     }
 
+    @Override
     public ProdutoEntity findEntityById(String id) {
         return this.repository.findById(id)
                 .orElseThrow(() -> NotFoundException.ofProduct(id)
                 );
     }
 
+    @Override
     public void validate(String produtoId) {
         this.findById(produtoId);
     }
@@ -71,6 +77,7 @@ public class ProdutoService {
         produtoSearchRepository.save(mapper.toDocument(produto));
     }
 
+    @Override
     @Transactional
     public void updateStock(String idProduto, int quantidade) {
         log.info("m=updateStock atualizando estoque do produto {}", idProduto);

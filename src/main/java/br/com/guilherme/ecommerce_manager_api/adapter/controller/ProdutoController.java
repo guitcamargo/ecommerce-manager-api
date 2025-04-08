@@ -1,7 +1,7 @@
 package br.com.guilherme.ecommerce_manager_api.adapter.controller;
 
-import br.com.guilherme.ecommerce_manager_api.application.service.ProdutoSearchService;
-import br.com.guilherme.ecommerce_manager_api.application.service.ProdutoService;
+import br.com.guilherme.ecommerce_manager_api.application.produto.ProdutoService;
+import br.com.guilherme.ecommerce_manager_api.application.produtoSearch.ProdutoSearchService;
 import br.com.guilherme.ecommerce_manager_api.dto.produto.ProdutoRequestDTO;
 import br.com.guilherme.ecommerce_manager_api.dto.produto.ProdutoResponseDTO;
 import br.com.guilherme.ecommerce_manager_api.dto.produto.ProdutoSearchFilterDTO;
@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -30,7 +31,11 @@ public class ProdutoController {
     @GetMapping
     @PreAuthorize("hasRole('USER')")
     @Operation(summary = "Buscar produtos", description = "Lista todos os produtos / possível aplicar filtros")
-    public List<ProdutoResponseDTO> buscarProdutos(@Valid ProdutoSearchFilterDTO filter) {
+    public List<ProdutoResponseDTO> buscarProdutos(@RequestParam(required = false) String nome,
+                                                   @RequestParam(required = false) String categoria,
+                                                   @RequestParam(required = false) BigDecimal precoMin,
+                                                   @RequestParam(required = false) BigDecimal precoMaximo) {
+        var filter = new ProdutoSearchFilterDTO(nome, categoria, precoMin, precoMaximo);
         return produtoSearchService.findAllBy(filter);
     }
     @ResponseStatus(HttpStatus.OK)

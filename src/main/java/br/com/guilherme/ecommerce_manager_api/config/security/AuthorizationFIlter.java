@@ -1,6 +1,6 @@
 package br.com.guilherme.ecommerce_manager_api.config.security;
 
-import br.com.guilherme.ecommerce_manager_api.application.service.UsuarioService;
+import br.com.guilherme.ecommerce_manager_api.application.usuario.UsuarioService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,6 +1,6 @@
 package br.com.guilherme.ecommerce_manager_api.adapter.controller;
 
-import br.com.guilherme.ecommerce_manager_api.application.service.RelatorioService;
+import br.com.guilherme.ecommerce_manager_api.application.relatorio.RelatorioService;
 import br.com.guilherme.ecommerce_manager_api.dto.relatorio.RelatorioRequestDTO;
 import br.com.guilherme.ecommerce_manager_api.dto.relatorio.RelatorioResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;

@@ -1,4 +1,4 @@
-package br.com.guilherme.ecommerce_manager_api.application.service;
+package br.com.guilherme.ecommerce_manager_api.application.auth;
 
 import br.com.guilherme.ecommerce_manager_api.config.security.JwtService;
 import br.com.guilherme.ecommerce_manager_api.domain.entity.UsuarioEntity;
@@ -15,11 +15,12 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AuthService {
+public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
 
+    @Override
     public AuthResponseDTO auth(AuthRequestDTO request) {
         log.info("m=auth Request de autorização: {}", request);
         Authentication auth = authenticationManager.authenticate(
@@ -34,7 +35,7 @@ public class AuthService {
                 .build();
     }
 
-
+    @Override
     public UsuarioEntity extractUserLogged() {
         return (UsuarioEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }

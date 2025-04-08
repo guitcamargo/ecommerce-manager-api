@@ -1,6 +1,6 @@
 package br.com.guilherme.ecommerce_manager_api.adapter.controller;
 
-import br.com.guilherme.ecommerce_manager_api.application.service.AuthService;
+import br.com.guilherme.ecommerce_manager_api.application.auth.AuthService;
 import br.com.guilherme.ecommerce_manager_api.dto.auth.AuthRequestDTO;
 import br.com.guilherme.ecommerce_manager_api.dto.auth.AuthResponseDTO;
 import io.swagger.v3.oas.annotations.tags.Tag;

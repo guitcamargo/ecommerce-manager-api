@@ -1,6 +1,6 @@
 package br.com.guilherme.ecommerce_manager_api.validation;
 
-import br.com.guilherme.ecommerce_manager_api.application.service.ProdutoService;
+import br.com.guilherme.ecommerce_manager_api.application.produto.ProdutoService;
 import br.com.guilherme.ecommerce_manager_api.domain.exception.NotFoundException;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

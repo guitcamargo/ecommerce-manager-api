@@ -1,6 +1,8 @@
-package br.com.guilherme.ecommerce_manager_api.application.service;
+package br.com.guilherme.ecommerce_manager_api.application.pedido;
 
 import br.com.guilherme.ecommerce_manager_api.adapter.mapper.PedidoMapper;
+import br.com.guilherme.ecommerce_manager_api.application.auth.AuthService;
+import br.com.guilherme.ecommerce_manager_api.application.produto.ProdutoService;
 import br.com.guilherme.ecommerce_manager_api.domain.document.ProdutoDocument;
 import br.com.guilherme.ecommerce_manager_api.domain.entity.PedidoEntity;
 import br.com.guilherme.ecommerce_manager_api.domain.exception.EstoqueInsuficienteException;
@@ -28,7 +30,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class PedidoService {
+public class PedidoServiceImpl implements PedidoService {
 
     private final PedidoRepository repository;
     private final PedidoMapper mapper;
@@ -37,6 +39,7 @@ public class PedidoService {
     private final KafkaProducerService kafkaService;
     private final AuthService authService;
 
+    @Override
     @Transactional(noRollbackFor = PedidoCanceladoException.class)
     public PedidoResponseDTO create(PedidoRequestDTO pedido) throws PedidoCanceladoException {
         log.info("m=create Criando novo pedido, pedido={}", pedido);
@@ -45,13 +48,14 @@ public class PedidoService {
             validateItemsStock(entity);
             return mapper.toResponse(repository.save(entity));
         } catch (EstoqueInsuficienteException e) {
-            log.error("Erro ao criar pedido, msg: {}", e.getMessage(), e);
+            log.error("m=create Erro ao criar pedido, msg: {}", e.getMessage(), e);
             entity.setCancelledStatus();
             repository.save(entity);
             throw new PedidoCanceladoException("Pedido Cancelado - "+e.getMessage());
         }
     }
 
+    @Override
     @Transactional
     public void processPayment(Long pedidoId) {
         log.info("m=processPayment Processando pagamento para o pedido {}", pedidoId);
@@ -66,7 +70,7 @@ public class PedidoService {
             repository.save(pedido);
             kafkaService.sendPedidoPaid(pedidoId);
         } catch (EstoqueInsuficienteException e) {
-            log.error("Erro ao processar pagamento. {}", e.getMessage(), e);
+            log.error("m=processPayment Erro ao processar pagamento. {}", e.getMessage(), e);
             throw e;
         }
     }
@@ -93,11 +97,12 @@ public class PedidoService {
                 .map(item -> item.getProduto().getId())
                 .reduce((a, b) -> a + ", " + b)
                 .ifPresent(ids -> {
-                    log.warn("Estoque insuficiente para os produtos: {}", ids);
+                    log.warn("m=validateItemsStock Estoque insuficiente para os produtos: {}", ids);
                     throw EstoqueInsuficienteException.ofProdutos(ids);
                 });
     }
 
+    @Override
     @Transactional
     public void processPosPayment(Long pedidoId) {
         log.info("m=processPosPayment atualizando estoque, pedidoId:{}", pedidoId);
@@ -110,6 +115,7 @@ public class PedidoService {
 
     }
 
+    @Override
     public List<TopClientesResponseDTO> findTopClients(LocalDateTime inicio, LocalDateTime fim, Pageable pageable) {
         return repository.findTopUsers(inicio, fim, PedidoEntity.PedidoStatusEnum.PAGO, pageable)
                 .stream()
@@ -118,6 +124,7 @@ public class PedidoService {
                 .toList();
     }
 
+    @Override
     public List<TicketMedioResponseDTO> getTicketMedio(LocalDateTime inicio, LocalDateTime fim) {
         return repository.getTicketMedio(inicio, fim, PedidoEntity.PedidoStatusEnum.PAGO)
                 .stream()
@@ -126,6 +133,7 @@ public class PedidoService {
                 .toList();
     }
 
+    @Override
     public FaturamentoMensalResponseDTO getTotalRevenueForCurrentMonth() {
         var projection = repository.getTotalRevenueForCurrentMonth(PedidoEntity.PedidoStatusEnum.PAGO);
         return new FaturamentoMensalResponseDTO(projection.getTotal());

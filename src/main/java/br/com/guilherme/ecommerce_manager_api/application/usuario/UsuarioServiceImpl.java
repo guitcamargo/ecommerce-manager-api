@@ -1,4 +1,4 @@
-package br.com.guilherme.ecommerce_manager_api.application.service;
+package br.com.guilherme.ecommerce_manager_api.application.usuario;
 
 import br.com.guilherme.ecommerce_manager_api.domain.entity.UsuarioEntity;
 import br.com.guilherme.ecommerce_manager_api.domain.exception.NotFoundException;
@@ -13,15 +13,17 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UsuarioService implements UserDetailsService {
+public class UsuarioServiceImpl implements UserDetailsService, UsuarioService {
 
     private final UsuarioRepository repository;
 
 
+    @Override
     public UsuarioEntity findById(Long id) {
         return repository.findById(id).orElseThrow(() -> NotFoundException.ofUsuario(id));
     }
 
+    @Override
     public Optional<UserDetails> loadUserById(Long id) {
         return Optional.of(this.findById(id));
     }
