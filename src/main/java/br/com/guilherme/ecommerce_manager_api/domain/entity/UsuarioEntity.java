@@ -3,6 +3,7 @@ package br.com.guilherme.ecommerce_manager_api.domain.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,6 +17,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class UsuarioEntity implements UserDetails {
 
     public static final String TABLE_NAME = "usuario";
